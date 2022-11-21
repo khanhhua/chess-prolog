@@ -2,13 +2,17 @@
 
 :- use_module(cells, [cell/2]).
 :- use_module(pawn, [pawn/3]).
+:- use_module(knight, [knight/3]).
+:- use_module(rook, [rook/3]).
+:- use_module(bishop, [bishop/3]).
 
 :- debug.
 
 main :-
     assert(loc(white, pawn, cell(a, 2))),
-    assert(loc(white, pawn, cell(b, 2))),
-    assert(loc(white, pawn, cell(c, 2))),
+    assert(loc(white, rook, cell(a, 1))),
+    assert(loc(white, knight, cell(b, 1))),
+    assert(loc(white, bishop, cell(c, 1))),
     bagof((Piece, Cell), loc(white, Piece, Cell), Ps),!,
     % length(Ps, Count),
     % format("Count ~w\n", [Count]),
