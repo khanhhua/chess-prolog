@@ -1,4 +1,4 @@
-:- module(knight, [knight/3]).
+:- module(knight, [knight/3, knight/4]).
 
 :- use_module(cells, [northward/2,
                       southward/2,
@@ -50,6 +50,9 @@ knight(attack, cell(Col, Row), Cells) :-
         ; eastward(Col, C)
         , x2southward(Row, R)
     ), Cells).
+
+knight(block, Locations, _CurrentCell, cell(Col, RowZ)) :-
+    member((_, cell(Col, RowZ)), Locations),!.
 
 x2westward(A, B) :-
     westward(A, West),

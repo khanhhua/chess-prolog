@@ -1,4 +1,4 @@
-:- module(pawn, [pawn/3]).
+:- module(pawn, [pawn/3, pawn/4]).
 
 :- use_module(cells, [northward/2,
                         eastward/2,
@@ -20,3 +20,7 @@ pawn(attack, cell(Col, Row), Cells) :-
         ; westward(Col, C)
         ),
         Cells).
+
+pawn(block, Locations, cell(Col, Row), cell(Col, RowZ)) :-
+    member((_, cell(Col, RowZ)), Locations),
+    Row < RowZ.

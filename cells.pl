@@ -6,7 +6,8 @@
                     neighbor_col/2,
                     vertical/2,
                     horizontal/2,
-                    diagonals/3]).
+                    diagonals/3,
+                    project/3]).
 % Row 1
 cell(a, 1).
 cell(b, 1).
@@ -114,6 +115,66 @@ vertical(Col, Cells) :-
 horizontal(Row, Cells) :-
     bagof(cell(Col, Row), cell(Col, Row), Cells).
 
+project(cell(Col, Row), cell(ColZ, RowZ), Out) :-
+    ( project_northward(cell(Col, Row), cell(ColZ, RowZ), [], Cells)
+    ; project_southward(cell(Col, Row), cell(ColZ, RowZ), [], Cells)
+    ; project_eastward(cell(Col, Row), cell(ColZ, RowZ), [], Cells)
+    ; project_westward(cell(Col, Row), cell(ColZ, RowZ), [], Cells)
+    ; project_ne_ward(cell(Col, Row), cell(ColZ, RowZ), [], Cells)
+    ; project_se_ward(cell(Col, Row), cell(ColZ, RowZ), [], Cells)
+    ; project_nw_ward(cell(Col, Row), cell(ColZ, RowZ), [], Cells)
+    ; project_sw_ward(cell(Col, Row), cell(ColZ, RowZ), [], Cells)
+    ),!,
+    reverse(Cells, Out).
+
+project_northward(cell(Col, Row), CellZ, Cells, Out) :-
+    northward(Row, R),
+    ( cell(Col, R) == CellZ -> Out = [cell(Col, R) | Cells]
+    ; project_northward(cell(Col, R), CellZ, [cell(Col, R) | Cells], Out)
+    ).
+
+project_southward(cell(Col, Row), CellZ, Cells, Out) :-
+    southward(Row, R),
+    ( cell(Col, R) == CellZ -> Out = [cell(Col, R) | Cells]
+    ; project_southward(cell(Col, R), CellZ, [cell(Col, R) | Cells], Out)
+    ).
+
+project_eastward(cell(Col, Row), CellZ, Cells, Out) :-
+    eastward(Col, C),
+    ( cell(C, Row) == CellZ -> Out = [cell(C, Row) | Cells]
+    ; project_eastward(cell(C, Row), CellZ, [cell(C, Row) | Cells], Out)
+    ).
+
+project_westward(cell(Col, Row), CellZ, Cells, Out) :-
+    westward(Col, C),
+    ( cell(C, Row) == CellZ -> Out = [cell(C, Row) | Cells]
+    ; project_westward(cell(C, Row), CellZ, [cell(C, Row) | Cells], Out)
+    ).
+
+project_ne_ward(cell(Col, Row), CellZ, Cells, Out) :-
+    northward(Row, R),
+    eastward(Col, C),
+    ( cell(C, R) == CellZ -> Out = [cell(C, R) | Cells]
+    ; project_ne_ward(cell(C, R), CellZ, [cell(C, R) | Cells], Out)
+    ).
+project_se_ward(cell(Col, Row), CellZ, Cells, Out) :-
+    southward(Row, R),
+    eastward(Col, C),
+    ( cell(C, R) == CellZ -> Out = [cell(C, R) | Cells]
+    ; project_se_ward(cell(C, R), CellZ, [cell(C, R) | Cells], Out)
+    ).
+project_nw_ward(cell(Col, Row), CellZ, Cells, Out) :-
+    northward(Row, R),
+    westward(Col, C),
+    ( cell(C, R) == CellZ -> Out = [cell(C, R) | Cells]
+    ; project_nw_ward(cell(C, R), CellZ, [cell(C, R) | Cells], Out)
+    ).
+project_sw_ward(cell(Col, Row), CellZ, Cells, Out) :-
+    southward(Row, R),
+    westward(Col, C),
+    ( cell(C, R) == CellZ -> Out = [cell(C, R) | Cells]
+    ; project_sw_ward(cell(C, R), CellZ, [cell(C, R) | Cells], Out)
+    ).
 
 do_diagonal_ne(cell(Col, Row), Cells, Out) :-
     ( northward(Row, R)
