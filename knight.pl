@@ -1,4 +1,4 @@
-:- module(knight, [knight/3, knight/4]).
+:- module(knight, [knight/3, knight/5]).
 
 :- use_module(cells, [northward/2,
                       southward/2,
@@ -31,28 +31,27 @@ knight(move, cell(Col, Row), Cells) :-
     ), Cells).
 
 % ATTACK
-knight(attack, cell(Col, Row), Cells) :-
-    bagof(cell(C, R),
-        ( x2westward(Col, C)
-        , northward(Row, R)
-        ; x2westward(Col, C)
-        , southward(Row, R)
-        ; x2eastward(Col, C)
-        , northward(Row, R)
-        ; x2eastward(Col, C)
-        , southward(Row, R)
-        ; westward(Col, C)
-        , x2northward(Row, R)
-        ; eastward(Col, C)
-        , x2northward(Row, R)
-        ; westward(Col, C)
-        , x2southward(Row, R)
-        ; eastward(Col, C)
-        , x2southward(Row, R)
-    ), Cells).
+knight(attack, cell(Col, Row), cell(C, R)) :-
+    ( x2westward(Col, C)
+    , northward(Row, R)
+    ; x2westward(Col, C)
+    , southward(Row, R)
+    ; x2eastward(Col, C)
+    , northward(Row, R)
+    ; x2eastward(Col, C)
+    , southward(Row, R)
+    ; westward(Col, C)
+    , x2northward(Row, R)
+    ; eastward(Col, C)
+    , x2northward(Row, R)
+    ; westward(Col, C)
+    , x2southward(Row, R)
+    ; eastward(Col, C)
+    , x2southward(Row, R)
+    ).
 
-knight(block, Locations, _CurrentCell, cell(Col, RowZ)) :-
-    member((_, cell(Col, RowZ)), Locations),!.
+knight(block, MyCells, _EnemyCells, _CurrentCell, cell(ColZ, RowZ)) :-
+    member(cell(ColZ, RowZ), MyCells),!.
 
 x2westward(A, B) :-
     westward(A, West),

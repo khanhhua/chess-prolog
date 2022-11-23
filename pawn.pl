@@ -1,26 +1,52 @@
-:- module(pawn, [pawn/3, pawn/4]).
+:- module(pawn,
+    [ white_pawn/3
+    , white_pawn/5
+    , black_pawn/3
+    , black_pawn/5
+    ]).
 
-:- use_module(cells, [northward/2,
-                        eastward/2,
-                        westward/2]).
+:- use_module(cells,
+    [ northward/2
+    , eastward/2
+    , westward/2
+    ]).
 
-export(pawn/3).
+export(white_pawn/3).
 
 % RULES
 % MOVES
-pawn(move, cell(Col, Row), Cells) :-
+white_pawn(move, cell(Col, Row), Cells) :-
     northward(Row, R),
     Cells = [cell(Col, R)].
 
+black_pawn(move, cell(Col, Row), Cells) :-
+    southward(Row, R),
+    Cells = [cell(Col, R)].
 % ATTACK
-pawn(attack, cell(Col, Row), Cells) :-
+white_pawn(attack, cell(Col, Row), EnemyPieces, LegalCells) :-
     northward(Row, R),
     bagof(cell(C, R),
-        ( eastward(Col, C)
-        ; westward(Col, C)
+        ( ( eastward(Col, C)
+          ; westward(Col, C)
+          ), member(cell(C, R), EnemyPieces)
         ),
-        Cells).
+        LegalCells).
 
-pawn(block, Locations, cell(Col, Row), cell(Col, RowZ)) :-
-    member((_, cell(Col, RowZ)), Locations),
+white_pawn(block, MyCells, EnemyCells, cell(Col, Row), cell(Col, RowZ)) :-
+    append([MyCells, EnemyCells], OccupiedCells),
+    member(cell(Col, RowZ), OccupiedCells),
     Row < RowZ.
+
+black_pawn(attack, cell(Col, Row), EnemyPieces, LegalCells) :-
+    southward(Row, R),
+    bagof(cell(C, R),
+        ( ( eastward(Col, C)
+          ; westward(Col, C)
+          ), member(cell(C, R), EnemyPieces)
+        ),
+        LegalCells).
+
+black_pawn(block, MyCells, EnemyCells, cell(Col, Row), cell(Col, RowZ)) :-
+    append([MyCells, EnemyCells], OccupiedCells),
+    member(cell(Col, RowZ), OccupiedCells),
+    Row > RowZ.

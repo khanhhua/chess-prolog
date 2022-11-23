@@ -1,4 +1,4 @@
-:- module(rook, [rook/3, rook/4]).
+:- module(rook, [rook/3, rook/5]).
 
 :- use_module(cells, 
     [ cell/2
@@ -20,22 +20,22 @@ rook(move, cell(Col, Row), Out) :-
     exclude(identical(cell(Col, Row)), RawList, Out).
 
 % ATTACK
-rook(attack, cell(Col, Row), Out) :-
+rook(attack, cell(Col, Row), cell(C, R)) :-
     bagof(Cells,
         ( horizontal(Row, Cells)
         ; vertical(Col, Cells)
         ), Bag),
     append(Bag, RawList),
-    exclude(identical(cell(Col, Row)), RawList, Out).
+    member(cell(C, R), RawList).
 
-rook(block, Locations, cell(Col, Row), cell(Col, RowZ)) :-
-    member((_, BlockingCell), Locations),
-    project(cell(Col, Row), cell(Col, RowZ), Projection),
-    member(BlockingCell, Projection),!.
-rook(block, Locations, cell(Col, Row), cell(ColZ, Row)) :-
-    member((_, BlockingCell), Locations),
-    project(cell(Col, Row), cell(ColZ, Row), Projection),
-    member(BlockingCell, Projection),!.
+rook(block, MyCells, EnemyCells, cell(Col, Row), cell(ColZ, RowZ)) :-
+    append([MyCells, EnemyCells], OccupiedCells),
+    project(cell(Col, Row), cell(ColZ, RowZ), Projection),
+    intersection(OccupiedCells, Projection, Collision),
+    proper_length(Collision, L),
+    ( L == 1 -> not(member(cell(ColZ, RowZ), Collision))
+    ; L > 1 % You gotta collide with the target, right?!
+    ).
 
 identical(A, B) :-
     A == B.
