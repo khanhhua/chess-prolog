@@ -25,22 +25,18 @@ main :-
     bagof((Piece, Cell), loc(black, Piece, Cell), EnemyPieces),!,
 
     next_possible_moves(MyPieces, EnemyPieces, PossibleMoves),
-    % length(Ass, Count),
-    % format("Count ~w\n", [Count]),
     maplist([(Piece, Cell, NextPositions)] >> (
-        format("Piece ~w at ~w:\n", [Piece, Cell]),
-        maplist(format("- Next position: ~w\n"), NextPositions)
+        print_positions(Piece, Cell, NextPositions)
         ), PossibleMoves),
 
     next_possible_attacks(MyPieces, EnemyPieces, PossibleAttacks),
     maplist([(Piece, Cell, NextAttacks)] >> (
-        format("Piece ~w at ~w:\n", [Piece, Cell]),
-        maplist([(EnemyPiece, EnemyCell)]>>format("- Next attack: ~w at ~w\n", [EnemyPiece, EnemyCell]), NextAttacks)
+        print_attacks(Piece, Cell, NextAttacks)
         ), PossibleAttacks).
 
 next_possible_moves(MyPieces, EnemyPieces, PossibleMoves) :-
-    convlist([(Piece, Cell), Out] >> (Out = Cell), MyPieces, MyCells),
-    convlist([(Piece, Cell), Out] >> (Out = Cell), EnemyPieces, EnemyCells),
+    pieces_cells(MyPieces, MyCells),
+    pieces_cells(EnemyPieces, EnemyCells),
     convlist([(Piece, Cell), Out] >> (
         functor(_, Piece, 3),
         call(Piece, move, Cell, LegalCells),
@@ -50,15 +46,8 @@ next_possible_moves(MyPieces, EnemyPieces, PossibleMoves) :-
     ), MyPieces, PossibleMoves).
 
 next_possible_attacks(MyPieces, EnemyPieces, PossibleAttacks) :-
-    convlist([(Piece, Cell), Out] >> (Out = Cell), MyPieces, MyCells),
-    convlist([(Piece, Cell), Out] >> (Out = Cell), EnemyPieces, EnemyCells),
-
-    % format('OccupiedCells: ~w', [OccupiedCells]),nl,
-    % format('EnemyPieces: ~w', [EnemyPieces]),nl,
-    % format('PiecesOnBoard: ~w', [PiecesOnBoard]),nl,
-    % convlist([(_, Cell), Out] >> (Out = Cell), EnemyPieces, EnemyCells),!,
-    % format('MyCells: ~w', [MyCells]),nl,
-    % format('EnemyCells: ~w', [EnemyCells]),nl,
+    pieces_cells(MyPieces, MyCells),
+    pieces_cells(EnemyPieces, EnemyCells),
     
     convlist([(Piece, Cell), Out] >> (
         functor(_, Piece, 3),
@@ -73,10 +62,17 @@ next_possible_attacks(MyPieces, EnemyPieces, PossibleAttacks) :-
     ), MyPieces, PossibleAttacks).
 
 print_positions(Piece, Cell, Positions) :-
-    maplist(print_p(Piece, Cell), Positions).
+    format("Piece ~w at ~w:\n", [Piece, Cell]),
+    maplist(format("- Next move: to ~q\n"), Positions).
 
-print_p(Piece, Cell, Position) :-
-    format("Piece ~q at ~q moves to ~q", [Piece, Cell, Position]), nl.
+print_attacks(Piece, Cell, Attacks) :-
+    format("Piece ~w at ~w:\n", [Piece, Cell]),
+    maplist([(EnemyPiece, EnemyCell)] >>
+        format("- Next attack: ~w at ~w\n", [EnemyPiece, EnemyCell]),
+        Attacks).
 
 identical(A, B) :-
     A = B.
+
+pieces_cells(Pieces, Cells) :-
+    convlist([(_Piece, Cell), Out] >> (Out = Cell), Pieces, Cells).
